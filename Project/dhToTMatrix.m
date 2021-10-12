@@ -1,4 +1,4 @@
-function T = generateTransMatriceFromDH(a, alpha, theta, d)
+function T = dhToTMatrix(a, alpha, theta, d)
 
     % Create the Matrice
     T = simplify(sym([cos(theta)                -sin(theta)            0               a

@@ -1,0 +1,21 @@
+function [outputArg1,outputArg2] = generateInverse(T,m)
+%GENERATEINVERSE Summary of this function goes here
+%   Input Parameters
+
+%   Outputs three symbols
+%   Tinv * T_0n = T_mn
+
+%   T: Transformation Matrices (as symbols)
+%      [T_10, T_12 ... T_n,n-1]
+%   m: Start of T for Right Side
+
+    % Generate Tinv
+    Tinv = 
+    for i = 0:m
+    
+        
+
+    end
+
+end
+
