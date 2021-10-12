@@ -12,8 +12,6 @@ function [T_brk, T_sub] = setupRobot()
             pi/2    0       0       t6
             0       0       0.165   t7];
 
-    
-
     % Generate the DH Transformation Matrices between links using method
     T_10 = dhToTMatrix(dH(1,2), dH(1,1), dH(1,4), dH(1,3));
     T_21 = dhToTMatrix(dH(2,2), dH(2,1), dH(2,4), dH(2,3));
