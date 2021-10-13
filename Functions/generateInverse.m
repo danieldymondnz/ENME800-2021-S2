@@ -1,4 +1,4 @@
-function [Tinv, T_mn] = generateInverse(T,m)
+function [Tinv, T_mMax] = generateInverse(DH,m)
 %GENERATEINVERSE Summary of this function goes here
 %   Input Parameters
 
@@ -9,18 +9,14 @@ function [Tinv, T_mn] = generateInverse(T,m)
 %      [T_10, T_12 ... T_n,n-1]
 %   m: Start of T for Right Side
 
+    max = height(DH);
+
     % Generate Tinv
-    Tinv = eye(4);
-    for i = 1:m
-        Tinv = multiplyTransMatrice(Tinv, cell2sym(T(i)));
-    end
+    Tinv = dhToTMatrix(DH, m, 0);
     Tinv = inv(Tinv);
 
-    % Generate T_mn
-    T_mn = eye(4);
-    for i = m:length(T)
-        T_mn = multiplyTransMatrice(T_mn,cell2sym(T(i)));
-    end
+    % Generate T_mn 
+    T_mMax = dhToTMatrix(DH, max, m);
 
 end
 
