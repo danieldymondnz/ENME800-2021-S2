@@ -8,12 +8,12 @@ function [T_subs, DH] = ABB_Config()
     % Create DH Matrix
     %       alpha   a       d       theta
     DH = [  0       0       D1      T1
-            pi/2    A1      0       (T2 + pi/2)
-            pi      A2      0       T3
-            -pi/2   A3      D4      T4
-            -pi/2   0       0       T5
-            pi/2    0       0       T6
-            0       0       D7      T7];
+            pi/2    A1      0       T2
+            0       A2      0       T3
+            pi/2    A3      D4      T4
+            pi/2    0       0       T5
+            -pi/2   0       0       T6
+            0       0       D7      0];
 
     % Note:
     % D1 = 0.445, D4 = 0.795, D7 = 0.165

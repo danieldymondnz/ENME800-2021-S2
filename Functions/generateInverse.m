@@ -16,7 +16,7 @@ function [Tinv, T_mMax] = generateInverse(DH,m)
     Tinv = inv(Tinv);
 
     % Generate T_mn 
-    T_mMax = dhToTMatrix(DH, max, m);
+    T_mMax = dhToTMatrix(DH, max - 1, m);
 
 end
 
