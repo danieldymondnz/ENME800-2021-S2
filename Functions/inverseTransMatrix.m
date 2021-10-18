@@ -5,7 +5,7 @@ function [inversedMatrix] = inverseTransMatrix(transformationMatrix)
     R_BA = transformationMatrix(1:3, 1:3);
     
     % Inverse the Rotation Matrice
-    R_AB_T = inv(R_BA);
+    R_AB_T = transpose(R_BA);
 
     % Inverse the Position Vector
     P_AB = -R_AB_T * P_BA;

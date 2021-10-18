@@ -1,19 +1,16 @@
+%% Symbols
+syms T [1 7]; syms A [1 7]; syms D [1 7];
+syms S [1 7]; syms C [1 7];
+syms R [3 3]; syms P [3 1];
+syms C23; syms S23;
 
-% Create Syms for Theta
-syms T [1 7];
-syms A [1 7];
-syms D [1 7];
-syms S [1 7];
-syms C [1 7];
-syms R [3 3];
-syms P [3 1];
+%% Generate T_nm Matrices
+% Dummy for T_60
+T_60_Dummy = [R, P];
+T_60_Dummy = [T_60_Dummy; 0 0 0 1];
 
-T_70_Dummy = [R, P];
-T_70_Dummy = [T_70_Dummy; 0 0 0 1];
-
-% Load Config
+% Load Config from DH
 [T_subs, DH] = ABB_Config();
-
 T_10 = cell2sym(T_subs(1));
 T_21 = cell2sym(T_subs(2));
 T_32 = cell2sym(T_subs(3));
@@ -22,49 +19,56 @@ T_54 = cell2sym(T_subs(5));
 T_65 = cell2sym(T_subs(6));
 T_76 = cell2sym(T_subs(7));
 
-T_70 = dhToTMatrix(DH, 7, 0);
-T_70 = simplify(T_70);
-T_70 = thetaToTrigSyms(T_70)
+%% Generate Simplifications
+% T_76
+%T_76 = thetaToTrigSyms(T_76);
 
-T_73 = dhToTMatrix(DH, 7, 3)
+% T_64
+T_64 = dhToTMatrix(DH, 6, 4);
+%T_64 = thetaToTrigSyms(T_64);
 
-%% Split at 1
-[LH_Inv, RHS] = generateInverse(DH,1);
-LHS = multiplyTransMatrix(LH_Inv, T_70_Dummy);
-RHS = RHS;
+% T_36
+T_43 = dhToTMatrix(DH, 4, 3);
+%T_43 = thetaToTrigSyms(T_43);
 
-% Use (2, 4) to find equation for T1
-eqn_t1 = simplify(LHS(2,4)) == simplify(RHS(2,4))
+% T_63
+T_63 = multiplyTransMatrix(T_43, T_64);
+
+% T_31
+T_31 = dhToTMatrix(DH, 3, 1);
+T_31 = simplify(T_31);
+T_31 = subs23Syms(T_31);
+%T_31 = thetaToTrigSyms(T_31);
+
+% T_30
+T_30 = multiplyTransMatrix(T_10, T_31);
+%T_30 = thetaToTrigSyms(T_30);
+
+% T_60
+T_60 = multiplyTransMatrix(T_30, T_63);
+
+%% Perform Split at Frame 1 to find Theta 1 (T_1)
+T_10_inv = inverseTransMatrix(T_10);
+LHS = multiplyTransMatrix(T_10_inv, T_60_Dummy)
+RHS = multiplyTransMatrix(T_31, T_63)
+
+% Use (2, 4) to find equation for T_1
+eqn1_y = thetaToTrigSyms(simplify(LHS(2,4)) == simplify(RHS(2,4)))
 t1 = [atan2(P2, P1); atan2(-P2, -P1)]
 
-% % Use (1, 4) and (3, 4)
-% eqn_x = simplify(LHS(1,4)) == simplify(RHS(1,4))
-% eqn_z = LHS(3,4) == simplify(RHS(3,4))
-% sol_l = simplify(expand(LHS(1,4)^2 + LHS(3,4)^2))
-% sol_r = simplify(expand(RHS(1,4)^2 + RHS(3,4)^2))
-% sol_alg = simplify(sol_l == sol_r)
-% 
-% LHS = thetaToTrigSyms(LHS)
-% RHS = thetaToTrigSyms(RHS)
+% Use (1, 4) and (3, 4)
+eqn1_x = thetaToTrigSyms(simplify(LHS(1,4)) == simplify(RHS(1,4)))
+eqn1_z = thetaToTrigSyms(LHS(3,4) == simplify(RHS(3,4)))
 
 
+%% Perform Split at Frame 2
+T_20 = multiplyTransMatrix(T_10, T_21);
+T_20_inv = inverseTransMatrix(T_20);
+LHS = multiplyTransMatrix(T_20_inv, T_60_Dummy)
+RHS = multiplyTransMatrix(T_32, T_63)
 
-%% Split at 2
-% T_1 = atan2(P2, P1); % alt atan2(-P2, -P1)
-[LH_Inv, RHS] = generateInverse(DH,2);
-LH_Inv = simplify(LH_Inv); %subs(, T1, T_1);
-RHS = simplify(RHS); %subs(, T1, T_1);
-LHS = thetaToTrigSyms(multiplyTransMatrix(LH_Inv, T_70_Dummy))
-RHS = thetaToTrigSyms(RHS)
+eqn1_x = thetaToTrigSyms(simplify(LHS(1,4)) == simplify(RHS(1,4)))
+eqn1_y = thetaToTrigSyms(simplify(LHS(2,4)) == simplify(RHS(2,4)))
+eqn1_z = thetaToTrigSyms(LHS(3,4) == simplify(RHS(3,4)))
 
-%% Split at 3
-[LH_Inv, RHS] = generateInverse(DH,3);
-LHS = thetaToTrigSyms(simplify(multiplyTransMatrix(LH_Inv, T_70_Dummy)))
-RHS = thetaToTrigSyms(simplify(RHS))
-
-% eqn1 = LHS(1,4) == RHS(1,4)
-% eqn2 = LHS(2,4) == RHS(2,4)
-% 
-% % [A, B] = equationsToMatrix([eqn1 eqn2], [sin(T2 + T3) cos(T2 + T3)])
-% [solt2, solt3] = solve(eqn1, eqn2)
-% solt3 = simplify(solt3)
+%% Perform Pipers Method at Wrist
