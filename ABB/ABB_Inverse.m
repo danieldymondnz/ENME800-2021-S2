@@ -61,7 +61,7 @@ eqn1_x = thetaToTrigSyms(simplify(LHS(1,4)) == simplify(RHS(1,4)))
 eqn1_z = thetaToTrigSyms(LHS(3,4) == simplify(RHS(3,4)))
 
 
-%% Perform Split at Frame 2
+%% Perform Split at Frame 2 to find Theta 3 (T_3)
 T_20 = multiplyTransMatrix(T_10, T_21);
 T_20_inv = inverseTransMatrix(T_20);
 LHS = multiplyTransMatrix(T_20_inv, T_60_Dummy)
@@ -71,4 +71,21 @@ eqn1_x = thetaToTrigSyms(simplify(LHS(1,4)) == simplify(RHS(1,4)))
 eqn1_y = thetaToTrigSyms(simplify(LHS(2,4)) == simplify(RHS(2,4)))
 eqn1_z = thetaToTrigSyms(LHS(3,4) == simplify(RHS(3,4)))
 
-%% Perform Pipers Method at Wrist
+%% Perform Split at Frame 3 to find Theta 2 (T_2)
+T_30_inv = inverseTransMatrix(T_30)
+LHS = multiplyTransMatrix(T_30_inv, T_60_Dummy)
+RHS = T_63
+
+eq_x = collect(LHS(1,4), [C23 S23]) == RHS(1,4)
+eq_y = collect(LHS(2,4), [C23 S23]) == RHS(2,4)
+eq_z = collect(LHS(3,4), [C23 S23]) == RHS(3,4)
+
+% Two Factorised Equations - Solve for T_23
+% -(A1 + A2*C2 - P1*C1 - P2*S1)*C23 - (D1 + A2*S2 - P3)*S23 = A3
+% -(A1 + A2*C2 - P1*C1 - P2*S1)*S23 + (D1 + A2*S2 - P3)*C23 = D4
+
+% Solution for T_23 is found as:
+% admbc = -D4 * (A1 + A2*C2 - P1*C1 - P2*S1) - A3 * (D1 + A2*S2 - P3)
+% acpbd = -A3 * (A1 + A2*C2 - P1*C1 - P2*S1) + D4 * (D1 + A2*S2 - P3)
+% T_23 = atan2(admbc, acpbd)
+% T_2 = T_23 - T_3
