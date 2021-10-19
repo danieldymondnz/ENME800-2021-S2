@@ -18,7 +18,7 @@ T_70_PO = [ 0   0   1   1000
 
 T_60_PO = multiplyTransMatrix(T_70_PO, T_76_inv);
 T_60_PO = double(T_60_PO);
-[thetas_O] = ABB_IK_solveTheta(T_60_PO);
+[thetas_O] = ABB_IK_solveTheta(T_60_PO)
 
 % The tool at Position A can be described as T_70_PA
 % Get in Wrist Frame and determine thetas
@@ -29,12 +29,12 @@ T_70_PA = [ 0   1   0   1125
 
 T_60_PA = multiplyTransMatrix(T_70_PA, T_76_inv);
 T_60_PA = double(T_60_PA);
-[thetas_A] = ABB_IK_solveTheta(T_60_PA);
+[thetas_A] = ABB_IK_solveTheta(T_60_PA)
 
 %% Solve for PO to PA Trajectory
 
 % Find optimal path
-%[tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
+[tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
 POT = [0.0598    0.0437   -0.6301    0.1078   -0.5891    3.0519]
 PAT = [0.0222   -0.6604   -0.4992         0    0.4112   -1.5486]
 

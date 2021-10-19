@@ -72,9 +72,6 @@ function [time] = performLoopIteration(tMat, Pi_thetas, Pf_thetas, Vi, Vf, dT_MA
     
 end
 
-
-
-
 function [theta, a0, a1, a2, a3, maxVel] = generateCubicTrajectory(theta_i, theta_f, dTheta_i, dTheta_f, t_fi)
 %   GENERATECUBICTRAJECTORY Uses a cubic function to generate the cubic
 %   trajectory for a joint for theta_i to theta_f
@@ -105,3 +102,12 @@ function [theta, a0, a1, a2, a3, maxVel] = generateCubicTrajectory(theta_i, thet
 
 end
 
+function [lowerArray, middle, upperArray] = binarySplit(in)
+%%binarySplit Perform a binary split of an array of ordered values
+
+    middleIndex = floor((length(in) / 2));
+    middle = in(middleIndex);
+    lowerArray = in(1:middleIndex-1);
+    upperArray = in(middleIndex:length(in));
+
+end

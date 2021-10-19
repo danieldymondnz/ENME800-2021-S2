@@ -11,7 +11,10 @@ function [bestAindex, bestBindex] = findOptimalPath(posAThetas,posBThetas)
     for ai = 1:height(posAThetas)
         for bi = 1:height(posBThetas)
             delThetaAB = posBThetas(bi) - posAThetas(ai);
-            maxTheta = sum(delThetaAB);
+            alg = [ sumsqr(delThetaAB(:)) sumsqr(delThetaAB(2:6)) sumsqr(delThetaAB(3:6)) sumsqr(delThetaAB(4:6)) sumsqr(delThetaAB(5:6)) sumsqr(delThetaAB(6)) ];
+            maxTheta = max(alg);
+            
+            sum(delThetaAB);
             if maxTheta < bestTheta
                 bestAindex = ai;
                 bestBindex = bi;
