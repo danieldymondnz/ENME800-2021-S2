@@ -52,7 +52,7 @@ eqn2_x = thetaToTrigSyms(simplify(LHS(1,4)) == simplify(RHS(1,4)))
 eqn2_y = thetaToTrigSyms(simplify(LHS(2,4)) == simplify(RHS(2,4)))
 eqn2_z = thetaToTrigSyms(LHS(3,4) == simplify(RHS(3,4)))
 [exp, K] = ABB_IK_T3(eqn2_x, eqn2_y, eqn2_z)
-T_3 = atan2(A3, -D4) - [atan2(k, sqrt(A3^2 + D4^2 - K^2)), atan2(k, -sqrt(A3^2 + D4^2 - K^2))]
+T_3 = atan2(A3, -D4) - [atan2(K, sqrt(A3^2 + D4^2 - K^2)), atan2(K, -sqrt(A3^2 + D4^2 - K^2))]
 
 %% Perform Split at Frame 3 to find Theta 2 (T_2) and Theta 4 (T_4)
 T_30_inv = inverseTransMatrix(T_30)
@@ -62,31 +62,46 @@ RHS = T_63
 % Use (1:2, 4) to find equation for T_2 via T_23
 eqn3_x = collect(thetaToTrigSyms(LHS(1,4)), [C23 S23]) == RHS(1,4)
 eqn3_y = collect(thetaToTrigSyms(LHS(2,4)), [C23 S23]) == RHS(2,4)
-[eqn3_x, eqn3_y] = ABB_IK_T23(eqn3_x, eqn3_y)
-eqn3_x = subs(eqn3_x, [C1 S1 C2 S2], [cos(T1) sin(T1) cos(T2) sin(T2)]);
-eqn3_y = subs(eqn3_y, [C1 S1 C2 S2], [cos(T1) sin(T1) cos(T2) sin(T2)]);
-% S = solve([eqn3_x, eqn3_y], [S23 C23])
-% S_23 = thetaToTrigSyms(simplify(S.S23))
-% C_23 = thetaToTrigSyms(simplify(S.C23))
-% T_23 = atan2(S23, C23)
-% T_2 = T_23 - T_3
 
-% Two Factorised Equations - Solve for T_23
-% -(A1 + A2*C2 - P1*C1 - P2*S1)*C23 - (D1 + A2*S2 - P3)*S23 = A3
-% -(A1 + A2*C2 - P1*C1 - P2*S1)*S23 + (D1 + A2*S2 - P3)*C23 = D4
+% 2D Plane, Square
+[eqn3] = ABB_IK_T23(eqn3_x, eqn3_y)
 
-% Solution for T_23 is found as:
-% admbc = -D4 * (A1 + A2*C2 - P1*C1 - P2*S1) - A3 * (D1 + A2*S2 - P3)
-% acpbd = -A3 * (A1 + A2*C2 - P1*C1 - P2*S1) + D4 * (D1 + A2*S2 - P3)
-a = (P1*C1 + P2*S1 - A1);
-b = (D1 - P3);
-c = A3 + A2*(C2*C23 + S2*S23);
-d = D4 + A2*(C2*S23 - S2*C23);
-admbc = a*d - b*c
-acpbd = a*c - b*d
-admbc = expand(admbc)
-T_23 = atan2(admbc, acpbd);
-T_2 = T_23 - T_3
+%
+a = (D1 - P3);
+b = (P1*cos(T1) - A1 + P2*sin(T1));
+c = -(P1^2*cos(T1)^2 - P2^2*cos(T1)^2 + A1^2 + A2^2 - A3^2 + D1^2 - D4^2 + P2^2 + P3^2 - 2*D1*P3 + P1*P2*sin(2*T1) - 2*A1*P1*cos(T1) - 2*A1*P2*sin(T1))/(2*A2);
+t_2 = atan2(b,a) + [ atan2(sqrt(a^2 + b^2 - c^2), c) , -atan2(sqrt(a^2 + b^2 - c^2), c) ]
+
+% % % % % % % % % Use (1:2, 4) to find equation for T_2 via T_23
+% % % % % % % % eqn3_x = collect(thetaToTrigSyms(LHS(1,4)), [C23 S23]) == RHS(1,4)
+% % % % % % % % eqn3_y = collect(thetaToTrigSyms(LHS(2,4)), [C23 S23]) == RHS(2,4)
+% % % % % % % % [eqn3_x, eqn3_y] = ABB_IK_T23(eqn3_x, eqn3_y)
+% % % % % % % % eqn3_x = subs(eqn3_x, [C1 S1 C2 S2], [cos(T1) sin(T1) cos(T2) sin(T2)]);
+% % % % % % % % eqn3_y = subs(eqn3_y, [C1 S1 C2 S2], [cos(T1) sin(T1) cos(T2) sin(T2)]);
+% % % % % % % % % S = solve([eqn3_x, eqn3_y], [S23 C23])
+% % % % % % % % % S_23 = thetaToTrigSyms(simplify(S.S23))
+% % % % % % % % % C_23 = thetaToTrigSyms(simplify(S.C23))
+% % % % % % % % % T_23 = atan2(S23, C23)
+% % % % % % % % % T_2 = T_23 - T_3
+% % % % % % % % 
+% % % % % % % % % Two Factorised Equations - Solve for T_23
+% % % % % % % % % -(A1 + A2*C2 - P1*C1 - P2*S1)*C23 - (D1 + A2*S2 - P3)*S23 = A3
+% % % % % % % % % -(A1 + A2*C2 - P1*C1 - P2*S1)*S23 + (D1 + A2*S2 - P3)*C23 = D4
+% % % % % % % % 
+% % % % % % % % % % Solution for T_23 is found as:
+% % % % % % % % % % admbc = -D4 * (A1 + A2*C2 - P1*C1 - P2*S1) - A3 * (D1 + A2*S2 - P3)
+% % % % % % % % % % acpbd = -A3 * (A1 + A2*C2 - P1*C1 - P2*S1) + D4 * (D1 + A2*S2 - P3)
+% % % % % % % % % (P3 - D1 - A2*C2)*C23  -  (A2*S2 + P1*C1 + P2*S1 - A1)*S23  == A3
+% % % % % % % % % (P3 - D1 - A2*C2)*S23  +  (A2*S2 + P1*C1 + P2*S1 - A1)*C23  == D4
+% % % % % % % % a = (P3 - D1 - A2*C2); %(P1*C1 + P2*S1 - A1);
+% % % % % % % % b = (A2*S2 + P1*C1 + P2*S1 - A1); %(D1 - P3);
+% % % % % % % % c = A3; %A3 + A2*(C2*C23 + S2*S23);
+% % % % % % % % d = D4; %D4 + A2*(C2*S23 - S2*C23);
+% % % % % % % % admbc = a*d - b*c
+% % % % % % % % acpbd = a*c - b*d
+% % % % % % % % admbc = expand(admbc)
+% % % % % % % % T_23 = atan2(admbc, acpbd);
+% % % % % % % % T_2 = T_23 - T_3
 
 % Use (1, 3) and (3, 3) to find equation for T_4
 % Assuming that sin(T5) != 0
