@@ -7,7 +7,10 @@ function [thetas] = ABB_IK_solveTheta(T_70)
     syms S [1 6]; syms C [1 6];
     syms R [3 3]; syms P [3 1];
 
-    TOL_D = 10;
+    TOL_D = 2; TOL_T = deg2rad(2);
+
+    MAX_T = [deg2rad(180) deg2rad(155) deg2rad(75) deg2rad(400) deg2rad(120) deg2rad(400)];
+    MIN_T = [deg2rad(-180) deg2rad(-95) deg2rad(-180) deg2rad(-400) deg2rad(-120) deg2rad(-400)];
 
     % Extract Parameters
     R1_1 = T_70(1,1); R1_2 = T_70(1,2); R1_3 = T_70(1,3);
@@ -22,7 +25,7 @@ function [thetas] = ABB_IK_solveTheta(T_70)
     
 
     % Solve for T_1
-    T_1 = [atan2(P2, P1); atan2(-P2, -P1)];
+    T_1 = wrapToPi([atan2(P2, P1); atan2(-P2, -P1)]);
 
     % Solve for T_3
     for i=1:length(T_1)
@@ -30,6 +33,10 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         % Determine T_3 Values
         k_3 = -(- A1^2 + 2*cos(T_1(i))*A1*P1 + 2*sin(T_1(i))*A1*P2 + A2^2 + A3^2 - D1^2 + 2*D1*P3 + D4^2 - P1^2 - P2^2 - P3^2)/(2*A2);
         T_3 = double([atan2(A3, -D4) - atan2(k_3, sqrt(A3^2 + D4^2 - k_3^2)), atan2(A3, -D4) - atan2(k_3, -sqrt(A3^2 + D4^2 - k_3^2))]);
+        
+        % Constrain to Mechanical Limits
+        T_3(1) = wrapToRad(T_3(1), MIN_T(3), MAX_T(3));
+        T_3(2) = wrapToRad(T_3(2), MIN_T(3), MAX_T(3));
 
         % Append to Matrix
         thetas(2*i-1, :) = [T_1(i) 0 T_3(1) 0 0 0];
@@ -52,16 +59,21 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         b = (P1*cos(T1) - A1 + P2*sin(T1));
         c = -(P1^2*cos(T1)^2 - P2^2*cos(T1)^2 + A1^2 + A2^2 - A3^2 + D1^2 - D4^2 + P2^2 + P3^2 - 2*D1*P3 + P1*P2*sin(2*T1) - 2*A1*P1*cos(T1) - 2*A1*P2*sin(T1))/(2*A2);
         
+        
         T_21 = atan2(b,a) + atan2(sqrt(a^2 + b^2 - c^2), c);
         T_22 = atan2(b,a) - atan2(sqrt(a^2 + b^2 - c^2), c);
+
+        % Constrain to Mechanical Limits
+        T_21 = wrapToRad(T_21, MIN_T(2), MAX_T(2));
+        T_22 = wrapToRad(T_22, MIN_T(2), MAX_T(2));
         
 
         % OLD
 
         % (P1*cos(T1)* + P2*sin(T1) - A1)*cos(T2) + (P3 - D1)*sin(T2) == (A2 + A3*cos(T3) + D4*sin(T3))
-        a = P1*cos(T1)* + P2*sin(T1) - A1;
-        b = (P3 - D1);
-        c = (A2 + A3*cos(T3) + D4*sin(T3));
+%         a = P1*cos(T1)* + P2*sin(T1) - A1;
+%         b = (P3 - D1);
+%         c = (A2 + A3*cos(T3) + D4*sin(T3));
 
         % Solve
 %         r = a^2 + b^2 - c^2;
@@ -99,6 +111,10 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         T_41 = atan2(S4, C4);
         T_42 = -T_41;
 
+        % Constrain to Mechanical Limits
+        T_41 = wrapToRad(T_41, MIN_T(4), MAX_T(4));
+        T_42 = wrapToRad(T_42, MIN_T(4), MAX_T(4));
+
         % Append to Matrix
         temp_t4(2*i - 1, :) = [T1 T2 T3 T_41 0 0];
         temp_t4(2*i, :) =     [T1 T2 T3 T_42 0 0];
@@ -128,6 +144,10 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         % Solve
         T_51 = atan2(S5, C5);
         T_52 = -T_51;
+
+        % Constrain to Mechanical Limits
+        T_51 = wrapToRad(T_51, MIN_T(5), MAX_T(5));
+        T_52 = wrapToRad(T_52, MIN_T(5), MAX_T(5));
 
         % Append to Matrix
         temp_t5(2*i - 1, :) = [T1 T2 T3 T4 T_51 0];
@@ -162,6 +182,10 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         T_61 = atan2(S6, C6);
         T_62 = -T_61;
 
+        % Constrain to Mechanical Limits
+        T_61 = wrapToRad(T_61, MIN_T(6), MAX_T(6));
+        T_62 = wrapToRad(T_62, MIN_T(6), MAX_T(6));
+
         % Append to Matrix
         temp_t6(2*i - 1, :) = [T1 T2 T3 T4 T5 T_61];
         temp_t6(2*i, :) =     [T1 T2 T3 T4 T5 T_62];
@@ -170,49 +194,50 @@ function [thetas] = ABB_IK_solveTheta(T_70)
 
     thetas = temp_t6
 
-    % Clean-up for solutions that satisfy
-    fprintf("Generating")
-    [T_subs, DH] = ABB_Config();
-    % T_60 = dhToTMatrix(DH, 6, 0);
 
+    % Clean-up configurations which don't satisfy end-effector position
+    fprintf("Removing configruations which don't meet End-effector Position...\r\n")
 
+    % Obtain the DH Parameters    
+    [~, DH] = ABB_Config();
+    
+    % Iterate through each configuration
     for i=1:height(thetas)
 
-        
+        % Flag for verification
+        badData = 0;
 
+        % Extract parameters
         T1 = thetas(i,1); T2 = thetas(i,2); T3 = thetas(i,3);
         T4 = thetas(i,4); T5 = thetas(i,5); T6 = thetas(i,6); T7 = 0;
         theta = [T1 T2 T3 T4 T5 T6 T7];
         
+        % Generate the Transformation Matrix
         result = subsSymToT(DH, 6, 0, theta, A, D);
-        
-        badData = 0;
 
-        % If not in the correct position, then set flag
-%         if abs(result(1, 4) - T_70(1, 4)) > TOL_D
-%             badData = 1;
-%         elseif abs(result(2, 4) - T_70(2, 4)) > TOL_D
-%             badData = 1;
-%         elseif abs(result(3, 4) - T_70(3, 4)) > TOL_D
-%             badData = 1;
-%         end
+        % If positional difference falls outside tollerance, set flag
+        if abs(result(1, 4) - T_70(1, 4)) > TOL_D
+            badData = 1;
+        elseif abs(result(2, 4) - T_70(2, 4)) > TOL_D
+            badData = 1;
+        elseif abs(result(3, 4) - T_70(3, 4)) > TOL_D
+            badData = 1;
+        end
 
-        % Check Orientation
+        % If orientation difference falls outside tollerance, set flag
         for j=1:3
             for k=1:3
-                
-                % If not about the same, drop this 
-                if abs(result(j, k) - T_70(j, k)) > 100
+                if abs(result(j, k) - T_70(j, k)) > TOL_T
                     badData = 1;
                     continue
                 end
-
             end
             if badData == 1
                 continue
             end
         end
         
+        % If the flag has been set, clear configuration from the matrix
         if (badData)
             thetas(i, :) = 0;
             continue
@@ -223,5 +248,36 @@ function [thetas] = ABB_IK_solveTheta(T_70)
     % Cleanup
     thetas( all(~thetas,2), : ) = [];
 
-end
+    thetas
 
+%     % Cleanup
+%     fprintf("Removing configruations which don't meet Physical Limitations Position...\r\n")
+% 
+%     for i=1:height(thetas)
+% 
+%         badData = 0;
+% 
+%         % If theta is greater than acceptable, set flag
+%         for j=1:6
+%             
+%             if thetas(i,j) > MAX_T(j) || thetas(i,j) < MIN_T(j)
+%                 badData = 1;
+%             end
+%             if badData == 1
+%                 continue
+%             end
+% 
+%         end
+%         
+%         % If the flag has been set, clear configuration from the matrix
+%         if (badData)
+%             thetas(i, :) = 0;
+%             continue
+%         end    
+% 
+%     end
+% 
+%     % Cleanup
+%     thetas( all(~thetas,2), : ) = [];
+
+end
