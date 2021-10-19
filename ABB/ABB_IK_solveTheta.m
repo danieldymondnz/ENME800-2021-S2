@@ -1,29 +1,31 @@
-function [thetas] = ABB_IK_solveTheta(T_70)
+function [thetas] = ABB_IK_solveTheta(T_60)
 %ABB_IK_SOLVETHETA Summary of this function goes here
 %   Detailed explanation goes here
 
+    % Constants
+    TOL_D = 0.16; % Displacement Tollerance for End Effector - Derrived from Datasheet
+    TOL_T = deg2rad(1); % Angular Tollerance for End Effector
+    MAX_T = [deg2rad(180) deg2rad(95) deg2rad(180) deg2rad(400) deg2rad(120) deg2rad(400)]; % Max Rotation for each Joint from Datasheet
+    MIN_T = [deg2rad(-180) deg2rad(-155) deg2rad(-75) deg2rad(-400) deg2rad(-120) deg2rad(-400)]; % Min Rotation for each Joint from Datasheet
+
     % Syms
-    syms T [1 6]; syms A [1 6]; syms D [1 6];
-    syms S [1 6]; syms C [1 6];
-    syms R [3 3]; syms P [3 1];
+    syms T [1 6]; syms S [1 6]; syms C [1 6];
+    syms A [1 6]; syms D [1 6];    
 
-    TOL_D = 2; TOL_T = deg2rad(2);
-
-    MAX_T = [deg2rad(180) deg2rad(155) deg2rad(75) deg2rad(400) deg2rad(120) deg2rad(400)];
-    MIN_T = [deg2rad(-180) deg2rad(-95) deg2rad(-180) deg2rad(-400) deg2rad(-120) deg2rad(-400)];
+    % Start Generation
+    fprintf("Generating Configurations. This may take a moment...\n")
 
     % Extract Parameters
-    R1_1 = T_70(1,1); R1_2 = T_70(1,2); R1_3 = T_70(1,3);
-    R2_1 = T_70(2,1); R2_2 = T_70(2,2); R2_3 = T_70(2,3); 
-    R3_1 = T_70(3,1); R3_2 = T_70(3,2); R3_3 = T_70(3,3);
-    P1 = T_70(1,4);   P2 = T_70(2,4);   P3 = T_70(3,4);
+    R1_1 = T_60(1,1); R1_2 = T_60(1,2); R1_3 = T_60(1,3);
+    R2_1 = T_60(2,1); R2_2 = T_60(2,2); R2_3 = T_60(2,3); 
+    R3_1 = T_60(3,1); R3_2 = T_60(3,2); R3_3 = T_60(3,3);
+    P1 = T_60(1,4);   P2 = T_60(2,4);   P3 = T_60(3,4);
 
-    D1 = 445; D4 = 795; D7 = 165;
-    A1 = 150; A2 = 900; A3 = 115;
-    D = [445 0 0 795 0 0 165];
-    A = [150 900 115 0 0 0 0];
+    % Obtain the DH Parameters from the Config  
+    [~, A, D, DH] = ABB_Config();
+    D1 = D(1); D4 = D(4);
+    A1 = A(1); A2 = A(2); A3 = A(3);
     
-
     % Solve for T_1
     T_1 = wrapToPi([atan2(P2, P1); atan2(-P2, -P1)]);
 
@@ -109,7 +111,7 @@ function [thetas] = ABB_IK_solveTheta(T_70)
 
         % Solve
         T_41 = atan2(S4, C4);
-        T_42 = -T_41;
+        T_42 = T_41 + pi;
 
         % Constrain to Mechanical Limits
         T_41 = wrapToRad(T_41, MIN_T(4), MAX_T(4));
@@ -180,7 +182,7 @@ function [thetas] = ABB_IK_solveTheta(T_70)
 
         % Solve
         T_61 = atan2(S6, C6);
-        T_62 = -T_61;
+        T_62 = T_61 + pi;
 
         % Constrain to Mechanical Limits
         T_61 = wrapToRad(T_61, MIN_T(6), MAX_T(6));
@@ -192,14 +194,11 @@ function [thetas] = ABB_IK_solveTheta(T_70)
 
     end
 
-    thetas = temp_t6
-
+    thetas = temp_t6;
 
     % Clean-up configurations which don't satisfy end-effector position
-    fprintf("Removing configruations which don't meet End-effector Position...\r\n")
-
-    % Obtain the DH Parameters    
-    [~, DH] = ABB_Config();
+    fprintf("%d Configuration candidates generated\n", height(thetas))
+    fprintf("Removing configruations which don't meet End-effector Position...\n")
     
     % Iterate through each configuration
     for i=1:height(thetas)
@@ -216,25 +215,53 @@ function [thetas] = ABB_IK_solveTheta(T_70)
         result = subsSymToT(DH, 6, 0, theta, A, D);
 
         % If positional difference falls outside tollerance, set flag
-        if abs(result(1, 4) - T_70(1, 4)) > TOL_D
+        if abs(result(1, 4) - T_60(1, 4)) > TOL_D
             badData = 1;
-        elseif abs(result(2, 4) - T_70(2, 4)) > TOL_D
+        elseif abs(result(2, 4) - T_60(2, 4)) > TOL_D
             badData = 1;
-        elseif abs(result(3, 4) - T_70(3, 4)) > TOL_D
+        elseif abs(result(3, 4) - T_60(3, 4)) > TOL_D
             badData = 1;
         end
 
         % If orientation difference falls outside tollerance, set flag
         for j=1:3
             for k=1:3
-                if abs(result(j, k) - T_70(j, k)) > TOL_T
+                if abs(result(j, k) - T_60(j, k)) > TOL_T
                     badData = 1;
-                    continue
                 end
             end
             if badData == 1
                 continue
             end
+        end
+        
+        % If the flag has been set, clear configuration from the matrix
+        if (badData)
+            thetas(i, :) = 0;
+        end    
+
+    end
+
+    % Delete rows which have been cleared
+    thetas( all(~thetas,2), : ) = [];
+
+    % Cleanup
+    fprintf("Removing configruations which don't meet Physical Limitations Position...\n")
+
+    for i=1:height(thetas)
+
+        badData = 0;
+
+        % If theta is greater than acceptable, set flag
+        for j=1:6
+            
+            if thetas(i,j) > MAX_T(j) || thetas(i,j) < MIN_T(j)
+                badData = 1;
+            end
+            if badData == 1
+                continue
+            end
+
         end
         
         % If the flag has been set, clear configuration from the matrix
@@ -248,36 +275,7 @@ function [thetas] = ABB_IK_solveTheta(T_70)
     % Cleanup
     thetas( all(~thetas,2), : ) = [];
 
-    thetas
-
-%     % Cleanup
-%     fprintf("Removing configruations which don't meet Physical Limitations Position...\r\n")
-% 
-%     for i=1:height(thetas)
-% 
-%         badData = 0;
-% 
-%         % If theta is greater than acceptable, set flag
-%         for j=1:6
-%             
-%             if thetas(i,j) > MAX_T(j) || thetas(i,j) < MIN_T(j)
-%                 badData = 1;
-%             end
-%             if badData == 1
-%                 continue
-%             end
-% 
-%         end
-%         
-%         % If the flag has been set, clear configuration from the matrix
-%         if (badData)
-%             thetas(i, :) = 0;
-%             continue
-%         end    
-% 
-%     end
-% 
-%     % Cleanup
-%     thetas( all(~thetas,2), : ) = [];
+    % Display Result
+    fprintf("%d Configurations successfully generated\n", height(thetas))
 
 end

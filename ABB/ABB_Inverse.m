@@ -12,7 +12,7 @@ T_60_Dummy = [R, P];
 T_60_Dummy = [T_60_Dummy; 0 0 0 1];
 
 % Load Config from DH
-[T_subs, DH] = ABB_Config();
+[T_subs, ~, ~, DH] = ABB_Config();
 T_10 = cell2sym(T_subs(1)); T_21 = cell2sym(T_subs(2));
 T_32 = cell2sym(T_subs(3)); T_43 = cell2sym(T_subs(4));
 T_54 = cell2sym(T_subs(5)); T_65 = cell2sym(T_subs(6));
