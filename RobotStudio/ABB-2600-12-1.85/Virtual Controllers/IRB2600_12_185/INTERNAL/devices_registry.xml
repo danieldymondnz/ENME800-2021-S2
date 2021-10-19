@@ -1,0 +1,5 @@
+<?xml version = "1.0" encoding="utf-8" ?>
+<devices_registry xmlns="urn:abb-robotics-registry-devices">
+<struct prepath="C:/Users/danie/AppData/Local/ABB/RobotWare/RobotWare_6.12.4008/rules/devices/" postpath="sys_devices_struct.xml"/>
+<text prepath="C:/Users/danie/AppData/Local/ABB/RobotWare/RobotWare_6.12.4008/language/install/../" postpath="/controller/devices/sys_devices_text.xml"/>
+</devices_registry>

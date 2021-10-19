@@ -1,0 +1,38 @@
+#
+# Generated backup file, do not edit.
+#
+# Originally at: C:\Users\danie\Documents\GitHub\ENME800-2021-S2\RobotStudio\ABB-2600-12-1.85\Virtual Controllers\TEMP\a39890f3-4dbb-44e4-a124-dc2b9207aaad\backup.442534
+# 2021-10-19  09:10:57
+#
+>>SYSTEM_ID:
+VIRTUAL_USE
+
+>>PRODUCTS_ID:
+RobotWare Version: 6.12.04.00
+
+  RobotWare Base
+  English
+  Drive System IRB 2600/390/4400/6400R
+  ADU-790A in position X3
+  ADU-790A in position Y3
+  ADU-790A in position Z3
+  Axis Calibration
+  IRB 2600-12/1.85 Type B
+
+>>HOME:
+All public files and directories
+
+>>SYSPAR:
+SYS.cfg
+PROC.cfg
+MMC.cfg
+EIO.cfg
+SIO.cfg
+MOC.cfg
+
+
+>>TASK1: (T_ROB1,,)
+SYSMOD\user.sys @ 
+
+
+>>EOF:

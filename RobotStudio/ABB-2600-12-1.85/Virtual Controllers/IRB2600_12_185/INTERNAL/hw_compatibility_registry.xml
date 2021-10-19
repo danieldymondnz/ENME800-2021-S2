@@ -1,0 +1,4 @@
+<?xml version = "1.0" encoding="utf-8" ?>
+<hw_compatibility_registry xmlns="urn:abb-robotics-registry-hw-compatibility">
+<hw_compatibility prepath="C:/Users/danie/AppData/Local/ABB/RobotWare/RobotWare_6.12.4008/firmware/" postpath="hw_compatibility.xml"/>
+</hw_compatibility_registry>
