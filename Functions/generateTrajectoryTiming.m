@@ -26,6 +26,10 @@ function [time] = performLoopIteration(tMat, Pi_thetas, Pf_thetas, Vi, Vf, dT_MA
         mid = tMat;
     elseif length(tMat) == 2
         mid = tMat(1);
+    elseif length(tMat) == 3
+        low = tMat(1);
+        mid = tMat(2);
+        up = tMat(2:3);
     else
         % Split the Matrix in the Middle
         [low, mid, up] = binarySplit(tMat);

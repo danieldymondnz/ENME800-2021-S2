@@ -35,8 +35,10 @@ T_60_PA = double(T_60_PA);
 
 % Find optimal path
 [tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
-POT = [0.0598    0.0437   -0.6301    0.1078   -0.5891    3.0519]
-PAT = [0.0222   -0.6604   -0.4992         0    0.4112   -1.5486]
+POT = thetas_O(tOI, :);
+% [0.0598    0.0437   -0.6301    0.1078   -0.5891    3.0519]
+PAT = thetas_A(tOI, :);
+% [0.0222   -0.6604   -0.4992         0    0.4112   -1.5486]
 
 
 
