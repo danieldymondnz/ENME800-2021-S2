@@ -36,11 +36,7 @@ T_60_PA = double(T_60_PA);
 % Find optimal path
 [tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
 POT = thetas_O(tOI, :);
-% [0.0598    0.0437   -0.6301    0.1078   -0.5891    3.0519]
 PAT = thetas_A(tOI, :);
-% [0.0222   -0.6604   -0.4992         0    0.4112   -1.5486]
-
-
 
 %% Peform a Binary Search on T to find optimal time
 
@@ -58,7 +54,7 @@ FRAMES = 10;    % Number of desired frames for the animation
 
 % Create plot and animation timing information
 tMat = linspace(0, optTime, FRAMES);
-outputPlot = figure(1);
+outputPlot = figure;
 view(3);
 hold on;
 
@@ -69,7 +65,7 @@ for frm=1:length(tMat)
     t = tMat(frm);
 
     % For each joint, determine the angle at time
-    thetas = zeros(1,7);
+    thetas = zeros(1,6);
     for joint=1:6
         thetas(joint) = a_matrix(joint,1) + a_matrix(joint,2)*t + a_matrix(joint,3)*t^2 + a_matrix(joint,4)*t^3;
     

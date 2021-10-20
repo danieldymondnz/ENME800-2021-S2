@@ -1,6 +1,5 @@
 function [T_subs, a, d, DH] = ABB_Config()
-%ABB_Config Generates T_nm matrices and DH data for the ABB
-%IRB-2600-12/1.85 Robot
+%ABB_Config Generates T_nm matrices and DH data for the ABB IRB-2600-12/1.85 Robot
 % Outputs:
 % T_subs:   Cell Matrix of symbolic expressions for Tnm
 %           {T_10, T_21, ... , T_76}
@@ -10,7 +9,7 @@ function [T_subs, a, d, DH] = ABB_Config()
 % Values are in mm and radians.
     
     % Create Syms for Theta
-    syms T [1 7]; syms A [1 7]; syms D [1 7];
+    syms T [1 6]; syms A [1 7]; syms D [1 7];
     
     % Create DH Matrix
     %       alpha   a       d       theta

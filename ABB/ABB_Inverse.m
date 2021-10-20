@@ -2,7 +2,7 @@
 %  Daniel Dymond
 
 %% Symbols
-syms T [1 7]; syms A [1 7]; syms D [1 7];
+syms T [1 6]; syms A [1 7]; syms D [1 7];
 syms S [1 7]; syms C [1 7]; syms C23; syms S23;
 syms R [3 3]; syms P [3 1];
 

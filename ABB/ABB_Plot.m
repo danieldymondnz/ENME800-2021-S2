@@ -4,7 +4,7 @@ function [outputPlot] = ABB_Plot(theta, showPathPreview, outputPlot)
 %   showPathPreview:    Set to 1 to show path preview, or 0 otherwise.
     
     % Define Syms
-    syms T [1 7]; syms S [1 7]; syms C [1 7];
+    syms T [1 6]; syms S [1 7]; syms C [1 7];
     syms A [1 7]; syms D [1 7];
 
     % Load the ABB Config

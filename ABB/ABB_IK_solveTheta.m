@@ -208,8 +208,8 @@ function [thetas] = ABB_IK_solveTheta(T_60)
 
         % Extract parameters
         T1 = thetas(i,1); T2 = thetas(i,2); T3 = thetas(i,3);
-        T4 = thetas(i,4); T5 = thetas(i,5); T6 = thetas(i,6); T7 = 0;
-        theta = [T1 T2 T3 T4 T5 T6 T7];
+        T4 = thetas(i,4); T5 = thetas(i,5); T6 = thetas(i,6);
+        theta = [T1 T2 T3 T4 T5 T6];
         
         % Generate the Transformation Matrix
         result = subsSymToT(DH, 6, 0, theta, A, D);
