@@ -52,6 +52,7 @@ FRAMES = 10;    % Number of desired frames for the animation
 
 % Create plot and animation timing information
 tMat = linspace(0, optTime, FRAMES);
+pos = zeros(FRAMES, 3);
 outputPlot = figure;
 view(3);
 hold on;
@@ -71,7 +72,13 @@ for frm=1:length(tMat)
 
     % Clear old plot, draw the frame, and capture
     cla(outputPlot);
-    op = ABB_Plot(thetas, 1, outputPlot);
+    [op, x, y, z] = ABB_Plot(thetas, 1, outputPlot);
+    pos(frm, :) = [x, y, z];
+    if frm > 1
+        for n = 2:frm
+            op = plot3([pos(n-1,1) pos(n,1)], [pos(n-1,2) pos(n,2)], [pos(n-1,3) pos(n,3)], 'magenta', 'LineWidth', 2);
+        end
+    end
     anim(frm) = getframe(outputPlot);
     
 end

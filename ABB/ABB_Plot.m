@@ -1,4 +1,4 @@
-function [outputPlot] = ABB_Plot(theta, showPathPreview, outputPlot)
+function [outputPlot, x, y, z] = ABB_Plot(theta, showPathPreview, outputPlot)
 %ABB_PLOT Generate an Output Plot of the Robot Arm
 %   theta:              row vector of thetas 1-7
 %   showPathPreview:    Set to 1 to show path preview, or 0 otherwise.
@@ -27,6 +27,11 @@ function [outputPlot] = ABB_Plot(theta, showPathPreview, outputPlot)
         outputPlot = drawAxis(T_n0);
         T_nm10 = T_n0;
     end
+    
+    x = T_n0(1,4);
+    y = T_n0(2,4);
+    z = T_n0(3,4);
+
     axis equal;
 
 end
