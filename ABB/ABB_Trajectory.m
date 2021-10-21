@@ -14,7 +14,6 @@ T_70_PO = [ 0   0   1   1000
             0   1   0   0050
             -1  0   0   1000 
             0   0   0   1    ];
-
 T_60_PO = multiplyTransMatrix(T_70_PO, T_76_inv);
 T_60_PO = double(T_60_PO);
 [thetas_O] = ABB_IK_solveTheta(T_60_PO);
@@ -25,16 +24,15 @@ T_70_PA = [ 0   1   0   1125
             1   0   0   0025
             0   0   -1  0308
             0   0   0   1       ];
-
 T_60_PA = multiplyTransMatrix(T_70_PA, T_76_inv);
 T_60_PA = double(T_60_PA);
 [thetas_A] = ABB_IK_solveTheta(T_60_PA);
 
 %% Solve for PO to PA Trajectory
 % Find optimal path
-[tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
-POT = thetas_O(tOI, :);
-PAT = thetas_A(tOI, :);
+[~, tAI] = findOptimalPath(thetas_O(1,:), thetas_A);
+POT = thetas_O(1, :);
+PAT = thetas_A(tAI, :);
 
 %% Peform a Binary Search on T to find optimal time
 
@@ -84,5 +82,5 @@ for frm=1:length(tMat)
 end
 
 % Display animation
-figure(2)
+figure;
 movie(anim,10)

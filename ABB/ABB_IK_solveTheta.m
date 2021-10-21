@@ -36,8 +36,16 @@ function [thetas] = ABB_IK_solveTheta(T_60)
 
         % Determine T_3 Values
         k_3 = -(- A1^2 + 2*cos(thetas(i,1))*A1*P1 + 2*sin(thetas(i,1))*A1*P2 + A2^2 + A3^2 - D1^2 + 2*D1*P3 + D4^2 - P1^2 - P2^2 - P3^2)/(2*A2);
-        T_3 = double([atan2(A3, -D4) - atan2(k_3, sqrt(A3^2 + D4^2 - k_3^2)), atan2(A3, -D4) - atan2(k_3, -sqrt(A3^2 + D4^2 - k_3^2))]);
-        
+        square_root = sqrt(A3^2 + D4^2 - k_3^2);
+
+        % If achievable, calculate. Otherwise, place a dummy value (which
+        % will get filtered out in the cleanup.
+        if isreal(square_root)
+            T_3 = double([atan2(A3, -D4) - atan2(k_3, square_root), atan2(A3, -D4) - atan2(k_3, -square_root)]);
+        else
+            T_3(1:2,1) = 0;
+        end
+
         % Constrain to Mechanical Limits
         T_3(1) = wrapToRad(T_3(1), MIN_T(3), MAX_T(3));
         T_3(2) = wrapToRad(T_3(2), MIN_T(3), MAX_T(3));
@@ -62,10 +70,17 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         a = (D1 - P3);
         b = (P1*cos(T1) - A1 + P2*sin(T1));
         c = -(P1^2*cos(T1)^2 - P2^2*cos(T1)^2 + A1^2 + A2^2 - A3^2 + D1^2 - D4^2 + P2^2 + P3^2 - 2*D1*P3 + P1*P2*sin(2*T1) - 2*A1*P1*cos(T1) - 2*A1*P2*sin(T1))/(2*A2);
-        
-        % Determine Solutions
-        T_21 = atan2(b,a) + atan2(sqrt(a^2 + b^2 - c^2), c);
-        T_22 = atan2(b,a) - atan2(sqrt(a^2 + b^2 - c^2), c);
+        square_root = sqrt(a^2 + b^2 - c^2);
+
+        % If achievable, calculate. Otherwise, place a dummy value (which
+        % will get filtered out in the cleanup.
+        if isreal(square_root)
+            T_21 = atan2(b,a) + atan2(square_root, c);
+            T_22 = atan2(b,a) - atan2(square_root, c);
+        else
+            T_21 = 0;
+            T_22 = 0;
+        end
 
         % Constrain to Mechanical Limits
         T_21 = wrapToRad(T_21, MIN_T(2), MAX_T(2));
