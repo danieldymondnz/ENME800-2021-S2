@@ -7,10 +7,11 @@ function [optTime, calc] = generateTrajectoryTiming(Pi_thetas,Pf_thetas,Vi, Vf, 
     % Create a matrix of times to binary search
     tMat = linspace(0, T_max, samples + 1);
 
-    % 
+    % Determine the optimal time for the path
     [optTime] = performLoopIteration(tMat, Pi_thetas, Pf_thetas, Vi, Vf, dT_MAX, T_max, samples);
 
-    %
+    % Calculate the a0-3 constants, and joint velocities based on the best
+    % time
     calc = zeros(length(dT_MAX), 5);
     for joint=1:length(dT_MAX)
         [~, a0, a1, a2, a3, maxVel] = generateCubicTrajectory(Pi_thetas(joint), Pf_thetas(joint), Vi, Vf, optTime);

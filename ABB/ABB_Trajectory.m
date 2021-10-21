@@ -32,7 +32,6 @@ T_60_PA = double(T_60_PA);
 [thetas_A] = ABB_IK_solveTheta(T_60_PA)
 
 %% Solve for PO to PA Trajectory
-
 % Find optimal path
 [tOI, tAI] = findOptimalPath(thetas_O, thetas_A);
 POT = thetas_O(tOI, :);

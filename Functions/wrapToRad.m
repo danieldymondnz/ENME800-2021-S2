@@ -38,27 +38,5 @@ function [angle] = wrapToRad(angle, min, max)
     end
 
 
-%     % Convert angle within the +2pi, -2pi range
-%     if abs(angle) > (2*pi)
-%         angle = sign(angle) * mod(angle, 2*pi);
-%     end
-% 
-%     % Attempt to generate an angle within the working envelope
-%     big = 0; small = 0;
-% 
-%     % Attempt to fit within working envelope
-%     if angle > max
-%         big = 1;
-%     end
-%     if angle < min
-%         small = 1;
-%     end
-% 
-%     if big == 1
-%         angle = angle - (2*pi);
-%     elseif small == 1
-%         angle = angle + (2*pi);
-%     end
-
 end
 
