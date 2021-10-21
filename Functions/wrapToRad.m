@@ -6,7 +6,6 @@ function [angle] = wrapToRad(angle, min, max)
 % max   : Maximum angle in radians
 % Angle should always follow max > min
 
-
     % If angle is too big
     if angle > max
         
@@ -37,6 +36,4 @@ function [angle] = wrapToRad(angle, min, max)
 
     end
 
-
 end
-

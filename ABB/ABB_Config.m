@@ -3,10 +3,9 @@ function [T_subs, a, d, DH] = ABB_Config()
 % Outputs:
 % T_subs:   Cell Matrix of symbolic expressions for Tnm
 %           {T_10, T_21, ... , T_76}
-% a     :   Values for A
-% d     :   Values for D
+% a     :   Values for A (rads)
+% d     :   Values for D (mm)
 % DH    :   The DH Matrix
-% Values are in mm and radians.
     
     % Create Syms for Theta
     syms T [1 6]; syms A [1 7]; syms D [1 7];

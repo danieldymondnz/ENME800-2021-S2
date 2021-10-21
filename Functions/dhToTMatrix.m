@@ -26,11 +26,9 @@ function T_nm = dhToTMatrix(DH, n, m)
             else
                 T_nm = multiplyTransMatrix(T_nm, T);
             end
-
         end
 
     end
-
 
 end
 

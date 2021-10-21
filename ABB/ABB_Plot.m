@@ -15,23 +15,19 @@ function [outputPlot] = ABB_Plot(theta, showPathPreview, outputPlot)
         outputPlot = drawDesiredPath();
     end
 
+    % Plot {0}
     F_0 = eye(4);
     outputPlot = drawAxis(F_0);
     T_nm10 = F_0;
 
     % Iterate through all frames
     for n = 1:height(DH)
-
         T_n0 = subsSymToT(DH, n, 0, theta, a, d);
         outputPlot = plot3([T_nm10(1,4) T_n0(1,4)], [T_nm10(2,4) T_n0(2,4)], [T_nm10(3,4) T_n0(3,4)], 'black', 'LineWidth', 2);
         outputPlot = drawAxis(T_n0);
         T_nm10 = T_n0;
-
-
     end
-
     axis equal;
 
-    
 end
 

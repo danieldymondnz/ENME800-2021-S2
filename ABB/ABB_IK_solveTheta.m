@@ -1,13 +1,13 @@
 function [thetas] = ABB_IK_solveTheta(T_60)
-%ABB_IK_SOLVETHETA Summary of this function goes here
-%   Detailed explanation goes here
+%ABB_IK_SOLVETHETA Solve the Inverse Kinematics for a given position of the
+%Wrist Frame {6}
 
     % Constants
     TOL_D = 0.16; % Displacement Tollerance for End Effector - Derrived from Datasheet
     TOL_T = deg2rad(1); % Angular Tollerance for End Effector
     MAX_T = [deg2rad(180) deg2rad(95) deg2rad(180) deg2rad(400) deg2rad(120) deg2rad(400)]; % Max Rotation for each Joint from Datasheet
     MIN_T = [deg2rad(-180) deg2rad(-155) deg2rad(-75) deg2rad(-400) deg2rad(-120) deg2rad(-400)]; % Min Rotation for each Joint from Datasheet
-    ZERO_TOL = 1e-12;
+    ZERO_TOL = 1e-12; % Tollerance used to determine zero due to floating point error
 
     % Syms
     syms T [1 6]; syms S [1 6]; syms C [1 6];
@@ -30,9 +30,8 @@ function [thetas] = ABB_IK_solveTheta(T_60)
     % Solve for T_1
     thetas = wrapToPi([atan2(P2, P1) 0 0 0 0 0; atan2(-P2, -P1) 0 0 0 0 0]);
 
-    temp_t3 = zeros(4, 6);
-
     % Solve for T_3
+    temp_t3 = zeros(4, 6);
     for i=1:height(thetas)
 
         % Determine T_3 Values
@@ -47,12 +46,11 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         temp_t3(2*i-1, :) = [thetas(i,1) 0 T_3(1) 0 0 0];
         temp_t3(2*i, :) = [thetas(i,1) 0 T_3(2) 0 0 0];
 
-    end
-    	
+    end	
     thetas = temp_t3;
-    temp_t2 = zeros(8,6);
-
+    
     % Solve for T_2
+    temp_t2 = zeros(8,6);
     for i=1:height(thetas)
 
         % Solve for T_2
@@ -60,12 +58,12 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         T1 = thetas(i,1);
         T3 = thetas(i,3);
 
-        % Equation PArts
+        % Equation Parts
         a = (D1 - P3);
         b = (P1*cos(T1) - A1 + P2*sin(T1));
         c = -(P1^2*cos(T1)^2 - P2^2*cos(T1)^2 + A1^2 + A2^2 - A3^2 + D1^2 - D4^2 + P2^2 + P3^2 - 2*D1*P3 + P1*P2*sin(2*T1) - 2*A1*P1*cos(T1) - 2*A1*P2*sin(T1))/(2*A2);
         
-        
+        % Determine Solutions
         T_21 = atan2(b,a) + atan2(sqrt(a^2 + b^2 - c^2), c);
         T_22 = atan2(b,a) - atan2(sqrt(a^2 + b^2 - c^2), c);
 
@@ -73,40 +71,39 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         T_21 = wrapToRad(T_21, MIN_T(2), MAX_T(2));
         T_22 = wrapToRad(T_22, MIN_T(2), MAX_T(2));
         
-
         % Append to Matrix
         temp_t2(2*i - 1, :) = [T1 T_21 T3 0 0 0];
         temp_t2(2*i, :) =     [T1 T_22 T3 0 0 0];
 
     end
-
     thetas = temp_t2;
-    temp_t4 = zeros(16,6);
-
+    
     % Solve for T_4
+    temp_t4 = zeros(16,6);
     for i=1:height(thetas)
 
-        % Solve for T_2
-        % Subs values from T_1, T_3
+        % Solve for T_4
+        % Subs values from T_1, T_2, T_3
         T1 = thetas(i,1);
         T2 = thetas(i,2);
         T3 = thetas(i,3);
-
+        
+        % Find S23, C23
         S23 = cos(T2)*sin(T3) + sin(T2)*cos(T3);
         C23 = cos(T2)*cos(T3) - sin(T2)*sin(T3);
-
+        
+        % Find components C4, S4
         C4 = (S23*(R2_3*sin(T1) + cos(T1)*R1_3) - C23*R3_3);
         S4 = -(R1_3*sin(T1) - cos(T1)*R2_3);
 
-        % if singular
+        % If a singular configuration, set arbitrary angles
         if (abs(C4) < ZERO_TOL && abs(S4) < ZERO_TOL)
             T_41 = 0;
             T_42 = pi;
+        % Otherwise, solve using atan2
         else
-            % Solve
             T_41 = atan2(S4, C4);
             T_42 = T_41 + pi;
-            % Constrain to Mechanical Limits
             T_41 = wrapToRad(T_41, MIN_T(4), MAX_T(4));
             T_42 = wrapToRad(T_42, MIN_T(4), MAX_T(4));
         end
@@ -116,24 +113,25 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         temp_t4(2*i, :) =     [T1 T2 T3 T_42 0 0];
 
     end
-
     thetas = temp_t4;
-    temp_t5 = zeros(32,6);
-    
+
     % Solve for T_5
+    temp_t5 = zeros(32,6);
     for i=1:height(thetas)
 
-        % Subs values from T_1, T_3
+        % Subs values from T_1 - T_4
         T1 = thetas(i,1);
         T2 = thetas(i,2);
         T3 = thetas(i,3);
         T4 = thetas(i,4);
-
+        
+        % Calculate Coefficients
         S23 = cos(T2)*sin(T3) + sin(T2)*cos(T3);
         C23 = cos(T2)*cos(T3) - sin(T2)*sin(T3);
         C1 = cos(T1); S1 = sin(T1);
         C4 = cos(T4); S4 = sin(T4);
-
+        
+        % Calculate components
         S5 = S23*(C1*C4*R1_3 + C4*R2_3*S1) - C4*C23*R3_3 + C1*R2_3*S4 - R1_3*S1*S4;
         C5 = R3_3*S23 + C23*(R2_3*S1 + C1*R1_3);
 
@@ -150,29 +148,27 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         temp_t5(2*i, :) =     [T1 T2 T3 T4 T_52 0];
 
     end
-
     thetas = temp_t5;
 
-    
-    temp_t6 = zeros(64,6);
-
-
     % Solve for T_6
+    temp_t6 = zeros(64,6);
     for i=1:height(thetas)
 
-        % Subs values from T_1, T_3
+        % Subs values from T_1, T_5
         T1 = thetas(i,1);
         T2 = thetas(i,2);
         T3 = thetas(i,3);
         T4 = thetas(i,4);
         T5 = thetas(i,5);
-
+        
+        % Generate coefficients
         S23 = cos(T2)*sin(T3) + sin(T2)*cos(T3);
         C23 = cos(T2)*cos(T3) - sin(T2)*sin(T3);
         C1 = cos(T1); S1 = sin(T1);
         C4 = cos(T4); S4 = sin(T4);
         C5 = cos(T5); S5 = sin(T5);
-
+        
+        % Calculate components
         S6 = S23*(C1*R1_1*S4 + R2_1*S1*S4) - C1*C4*R2_1 + C4*R1_1*S1 - C23*R3_1*S4;
         C6 = C23*(C4*C5*R3_1 + C1*R1_1*S5 + R2_1*S1*S5) - S23*(C1*C4*C5*R1_1 - R3_1*S5 + C4*C5*R2_1*S1) - C1*C5*R2_1*S4 + C5*R1_1*S1*S4;
 
@@ -189,14 +185,12 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         temp_t6(2*i, :) =     [T1 T2 T3 T4 T5 T_62];
 
     end
-
     thetas = temp_t6;
 
-    % Clean-up configurations which don't satisfy end-effector position
     fprintf("%d Configuration candidates generated\n", height(thetas))
+
+    % Clean-up configurations which don't satisfy end-effector position
     fprintf("Removing configruations which don't meet End-effector Position...\n")
-    
-    % Iterate through each configuration
     for i=1:height(thetas)
 
         % Flag for verification
@@ -219,10 +213,11 @@ function [thetas] = ABB_IK_solveTheta(T_60)
             for k=1:3
                 if abs(result(j, k) - T_60(j, k)) > TOL_T
                     badData = 1;
+                    continue;
                 end
             end
             if badData == 1
-                continue
+                continue;
             end
         end
         
@@ -230,29 +225,22 @@ function [thetas] = ABB_IK_solveTheta(T_60)
         if (badData)
             thetas(i, :) = 0;
         end    
-
     end
 
     % Delete rows which have been cleared
     thetas( all(~thetas,2), : ) = [];
 
-    % Cleanup
-    fprintf("Removing configruations which don't meet Physical Limitations Position...\n")
-
+    % Cleanup configurations which don't meet Physical Limitations
+    fprintf("Removing configruations which don't meet Physical Limitations for Joints...\n")
     for i=1:height(thetas)
 
-        badData = 0;
-
         % If theta is greater than acceptable, set flag
+        badData = 0;
         for j=1:6
-            
             if thetas(i,j) > MAX_T(j) || thetas(i,j) < MIN_T(j)
                 badData = 1;
-            end
-            if badData == 1
                 continue
             end
-
         end
         
         % If the flag has been set, clear configuration from the matrix
@@ -263,10 +251,8 @@ function [thetas] = ABB_IK_solveTheta(T_60)
 
     end
 
-    % Cleanup
+    % Cleanup & Display Result
     thetas( all(~thetas,2), : ) = [];
-
-    % Display Result
     fprintf("%d Configurations successfully generated\n", height(thetas))
 
 end

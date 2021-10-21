@@ -1,10 +1,7 @@
 function symsOut = thetaToTrigSyms(symsIn)
     
-    syms T [1 6];
-    syms A [1 6];
-    syms D [1 6];
-    syms S [1 6];
-    syms C [1 6];
+    syms T [1 6]; syms A [1 6]; syms D [1 6];
+    syms S [1 6]; syms C [1 6];
 
     symsOut = symsIn;
     for i = 1:length(T)
@@ -12,4 +9,3 @@ function symsOut = thetaToTrigSyms(symsIn)
     end
 
 end
-
