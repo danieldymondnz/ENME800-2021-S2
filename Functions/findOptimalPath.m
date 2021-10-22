@@ -17,7 +17,7 @@ function [bestAindex, bestBindex] = findOptimalPath(posAThetas,posBThetas)
             delThetaAB = posBThetas(bi, :) - posAThetas(ai, :);
 
             % Perform squaring algorithm
-            alg = [ sumsqr(delThetaAB(:)) sumsqr(delThetaAB(2:6)) sumsqr(delThetaAB(3:6)) sumsqr(delThetaAB(4:6)) sumsqr(delThetaAB(5:6)) sumsqr(delThetaAB(6)) ];
+            alg = [ sum(delThetaAB(:)).^2 sum(delThetaAB(2:6)).^2 sum(delThetaAB(3:6)).^2 sum(delThetaAB(4:6)).^2 sum(delThetaAB(5:6)).^2 sum(delThetaAB(6)).^2 ];
             maxTheta = sum(abs(alg));
 
             % If better than current best solution, append
@@ -31,4 +31,3 @@ function [bestAindex, bestBindex] = findOptimalPath(posAThetas,posBThetas)
     end
 
 end
-

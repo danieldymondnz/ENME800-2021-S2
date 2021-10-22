@@ -1,6 +1,4 @@
 function [optTime, calc] = generateTrajectoryTiming(Pi_thetas,Pf_thetas,Vi, Vf, T_max, samples)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
     dT_MAX = deg2rad([175 175 175 360 360 500]);
 

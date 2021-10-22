@@ -8,4 +8,3 @@ function T_out = subs23Syms(T_in)
     T_out = subs(T_out, sin(T2 + T3), S23)
 
 end
-

@@ -2,7 +2,7 @@
 
 %% Symbols
 syms T [1 6]; syms A [1 7]; syms D [1 7];
-syms S [1 7]; syms C [1 7]; syms C23; syms S23;
+syms S [1 6]; syms C [1 6]; syms C23; syms S23;
 syms R [3 3]; syms P [3 1];
 
 %% Load Config from DH
@@ -15,7 +15,6 @@ T_76 = cell2sym(T_subs(6));
 %% Get Euler
 % Generate syms for cos, sin for alpha, beta, gamma
 syms c_a; syms c_b; syms c_g; syms s_a; syms s_b; syms s_g;
-
 T = sym([(c_a*c_b)    (c_a*s_b*s_g - s_a*c_g) (c_a*s_b*c_g + s_a*s_g)     P1
          (s_a*s_b)    (s_a*s_b*s_g + c_a*c_g) (s_a*s_b*c_g - c_a*s_g)     P2
          -s_b         (c_b*s_g)               (c_b*c_g)                   P3
@@ -29,8 +28,11 @@ T_final = multiplyTransMatrix(T, T_76)
 T_60_Dummy = [R, P];
 T_60_Dummy = [T_60_Dummy; 0 0 0 1];
 
+% Expression
+T_final == T_60_Dummy
+
 %% Generate Simplifications
-% Generate T_63
+% T_63
 T_64 = dhToTMatrix(DH, 6, 4);
 T_63 = multiplyTransMatrix(T_43, T_64);
 

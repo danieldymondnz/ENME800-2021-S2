@@ -11,4 +11,3 @@ function [Tinv, T_mMax] = generateInverse(DH,m)
     T_mMax = dhToTMatrix(DH, max - 1, m);
 
 end
-

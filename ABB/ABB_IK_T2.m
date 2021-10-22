@@ -36,4 +36,3 @@ function [output] = ABB_IK_T2(eqn_14, eqn_24)
     output = LHS == RHS;
 
 end
-

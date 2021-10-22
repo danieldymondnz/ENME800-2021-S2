@@ -35,4 +35,3 @@ function [outputPlot, x, y, z] = ABB_Plot(theta, showPathPreview, outputPlot)
     axis equal;
 
 end
-

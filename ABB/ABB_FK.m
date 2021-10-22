@@ -7,8 +7,7 @@ T_54 = cell2sym(T_subs(5)); T_65 = cell2sym(T_subs(6));
 T_76 = cell2sym(T_subs(7));
 
 % Generate Simplifications, then assemble
-
-% Generate T_63
+% T_63
 T_63 = dhToTMatrix(DH, 6, 3);
 T_63 = thetaToTrigSyms(T_63)
 

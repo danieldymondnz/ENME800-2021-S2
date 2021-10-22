@@ -14,4 +14,3 @@ function [inversedMatrix] = inverseTransMatrix(transformationMatrix)
     inversedMatrix = [inversedMatrix; 0, 0, 0, 1];
 
 end
-
